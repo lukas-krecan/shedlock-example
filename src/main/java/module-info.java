@@ -1,4 +1,4 @@
-module shedlock.example {
+open module shedlock.example {
     requires spring.context;
     requires spring.jdbc;
     requires slf4j.api;
@@ -7,7 +7,4 @@ module shedlock.example {
     requires HikariCP;
     requires shedlock.provider.jdbc.template;
     requires java.sql;
-
-    exports net.javacrumbs.shedlockexample to spring.core;
-    opens net.javacrumbs.shedlockexample to spring.core, spring.beans, spring.context;
 }
