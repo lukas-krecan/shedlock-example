@@ -1,0 +1,98 @@
+
+After adding module-info.java
+
+Caused by: java.lang.reflect.InaccessibleObjectException: Unable to make protected final java.lang.Class java.lang.ClassLoader.defineClass(java.lang.String,byte[],int,int,java.security.ProtectionDomain) throws java.lang.ClassFormatError accessible: module java.base does not "opens java.lang" to module spring.core
+	at java.base/java.lang.reflect.AccessibleObject.checkCanSetAccessible(AccessibleObject.java:337)
+	at java.base/java.lang.reflect.AccessibleObject.checkCanSetAccessible(AccessibleObject.java:281)
+	at java.base/java.lang.reflect.Method.checkCanSetAccessible(Method.java:198)
+	at java.base/java.lang.reflect.Method.setAccessible(Method.java:192)
+	at spring.core@4.3.7.RELEASE/org.springframework.cglib.core.ReflectUtils$1.run(ReflectUtils.java:54)
+	at java.base/java.security.AccessController.doPrivileged(Native Method)
+	at spring.core@4.3.7.RELEASE/org.springframework.cglib.core.ReflectUtils.<clinit>(ReflectUtils.java:44)
+	... 25 more
+
+
+- Upgrade Spring
+-- Error:java: the unnamed module reads package org.apache.commons.logging from both spring.jcl and jcl.over.slf4j
+
+-- remove         <dependency>
+                      <groupId>org.slf4j</groupId>
+                      <artifactId>jcl-over-slf4j</artifactId>
+                      <version>1.7.24</version>
+                  </dependency>
+
+--
+08:43:26.027 [main] DEBUG org.springframework.context.annotation.ConfigurationClassBeanDefinitionReader - Registering bean definition for @Bean method net.javacrumbs.shedlockexample.SpringConfig.dataSource()
+Exception in thread "main" java.lang.IllegalStateException: Cannot load configuration class: net.javacrumbs.shedlockexample.SpringConfig
+	at spring.context@5.0.0.RC4/org.springframework.context.annotation.ConfigurationClassPostProcessor.enhanceConfigurationClasses(ConfigurationClassPostProcessor.java:416)
+	at spring.context@5.0.0.RC4/org.springframework.context.annotation.ConfigurationClassPostProcessor.postProcessBeanFactory(ConfigurationClassPostProcessor.java:254)
+	at spring.context@5.0.0.RC4/org.springframework.context.support.PostProcessorRegistrationDelegate.invokeBeanFactoryPostProcessors(PostProcessorRegistrationDelegate.java:282)
+	at spring.context@5.0.0.RC4/org.springframework.context.support.PostProcessorRegistrationDelegate.invokeBeanFactoryPostProcessors(PostProcessorRegistrationDelegate.java:126)
+	at spring.context@5.0.0.RC4/org.springframework.context.support.AbstractApplicationContext.invokeBeanFactoryPostProcessors(AbstractApplicationContext.java:693)
+	at spring.context@5.0.0.RC4/org.springframework.context.support.AbstractApplicationContext.refresh(AbstractApplicationContext.java:531)
+	at spring.context@5.0.0.RC4/org.springframework.context.annotation.AnnotationConfigApplicationContext.<init>(AnnotationConfigApplicationContext.java:88)
+	at shedlock.example/net.javacrumbs.shedlockexample.App.main(App.java:11)
+Caused by: java.lang.ExceptionInInitializerError
+	at spring.context@5.0.0.RC4/org.springframework.context.annotation.ConfigurationClassEnhancer.newEnhancer(ConfigurationClassEnhancer.java:122)
+	at spring.context@5.0.0.RC4/org.springframework.context.annotation.ConfigurationClassEnhancer.enhance(ConfigurationClassEnhancer.java:110)
+	at spring.context@5.0.0.RC4/org.springframework.context.annotation.ConfigurationClassPostProcessor.enhanceConfigurationClasses(ConfigurationClassPostProcessor.java:405)
+	... 7 more
+Caused by: org.springframework.cglib.core.CodeGenerationException: java.lang.reflect.InaccessibleObjectException-->Unable to make protected final java.lang.Class java.lang.ClassLoader.defineClass(java.lang.String,byte[],int,int,java.security.ProtectionDomain) throws java.lang.ClassFormatError accessible: module java.base does not "opens java.lang" to module spring.core
+	at spring.core@5.0.0.RC4/org.springframework.cglib.core.ReflectUtils.defineClass(ReflectUtils.java:464)
+	at spring.core@5.0.0.RC4/org.springframework.cglib.core.AbstractClassGenerator.generate(AbstractClassGenerator.java:336)
+	at spring.core@5.0.0.RC4/org.springframework.cglib.core.AbstractClassGenerator$ClassLoaderData$3.apply(AbstractClassGenerator.java:93)
+	at spring.core@5.0.0.RC4/org.springframework.cglib.core.AbstractClassGenerator$ClassLoaderData$3.apply(AbstractClassGenerator.java:91)
+	at spring.core@5.0.0.RC4/org.springframework.cglib.core.internal.LoadingCache$2.call(LoadingCache.java:54)
+	at java.base/java.util.concurrent.FutureTask.run(FutureTask.java:264)
+	at spring.core@5.0.0.RC4/org.springframework.cglib.core.internal.LoadingCache.createEntry(LoadingCache.java:61)
+	at spring.core@5.0.0.RC4/org.springframework.cglib.core.internal.LoadingCache.get(LoadingCache.java:34)
+
+
+--add-opens java.base/java.lang=spring.core
+--
+Caused by: java.lang.IllegalAccessException: class org.springframework.cglib.proxy.Enhancer (in module spring.core) cannot access class net.javacrumbs.shedlockexample.SpringConfig$$EnhancerBySpringCGLIB$$81275b04 (in module shedlock.example) because module shedlock.example does not export net.javacrumbs.shedlockexample to module spring.core
+	at java.base/jdk.internal.reflect.Reflection.newIllegalAccessException(Reflection.java:361)
+	at java.base/java.lang.reflect.AccessibleObject.checkAccess(AccessibleObject.java:589)
+	at java.base/java.lang.reflect.Field.checkAccess(Field.java:1075)
+	at java.base/java.lang.reflect.Field.set(Field.java:778)
+
+opens net.javacrumbs.shedlockexample to spring.core;
+
+---
+Caused by: java.lang.IllegalAccessException: class org.springframework.beans.BeanUtils (in module spring.beans) cannot access class net.javacrumbs.shedlockexample.SpringConfig$$EnhancerBySpringCGLIB$$5b726aad (in module shedlock.example) because module shedlock.example does not export net.javacrumbs.shedlockexample to module spring.beans
+	at java.base/jdk.internal.reflect.Reflection.newIllegalAccessException(Reflection.java:361)
+	at java.base/java.lang.reflect.AccessibleObject.checkAccess(AccessibleObject.java:589)
+	at java.base/java.lang.reflect.Constructor.newInstance(Constructor.java:479)
+	at spring.beans@5.0.0.RC4/org.springframework.beans.BeanUtils.instantiateClass(BeanUtils.java:178)
+	... 14 more
+
+exports net.javacrumbs.shedlockexample to spring.beans;
+--
+Caused by: java.lang.IllegalAccessException: class org.springframework.context.annotation.ConfigurationClassEnhancer$BeanFactoryAwareMethodInterceptor (in module spring.context) cannot access class net.javacrumbs.shedlockexample.SpringConfig$$EnhancerBySpringCGLIB$$81275b04 (in module shedlock.example) because module shedlock.example does not export net.javacrumbs.shedlockexample to module spring.context
+	at java.base/jdk.internal.reflect.Reflection.newIllegalAccessException(Reflection.java:361)
+	at java.base/java.lang.reflect.AccessibleObject.checkAccess(AccessibleObject.java:589)
+	at java.base/java.lang.reflect.Field.checkAccess(Field.java:1075)
+	at java.base/java.lang.reflect.Field.set(Field.java:778)
+	at spring.context@5.0.0.RC4/org.springframework.context.annotation.ConfigurationClassEnhancer$BeanFactoryAwareMethodInterceptor.intercept(ConfigurationClassEnhancer.java:277)
+	at shedlock.example/net.javacrumbs.shedlockexample.SpringConfig$$EnhancerBySpringCGLIB$$81275b04.setBeanFactory(<generated>)
+	at spring.context@5.0.0.RC4/org.springframework.context.annotation.ConfigurationClassPostProcessor$ImportAwareBeanPostProcessor.postProcessPropertyValues(ConfigurationClassPostProcessor.java:437)
+	at spring.beans@5.0.0.RC4/org.springframework.beans.factory.support.AbstractAutowireCapableBeanFactory.populateBean(AbstractAutowireCapableBeanFactory.java:1340)
+	at spring.beans@5.0.0.RC4/org.springframework.beans.factory.support.AbstractAutowireCapableBeanFactory.doCreateBean(AbstractAutowireCapableBeanFactory.java:582)
+	... 10 more
+
+exports net.javacrumbs.shedlockexample to spring.beans, spring.context;
+
+
+--
+
+open module shedlock.example {
+
+
+fixes it
+
+-- maven
+
+compiler plugin 3.6.2
+
+
+- downgrade spring works
