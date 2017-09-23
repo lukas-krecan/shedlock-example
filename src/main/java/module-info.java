@@ -7,4 +7,7 @@ module shedlock.example {
     requires HikariCP;
     requires shedlock.provider.jdbc.template;
     requires java.sql;
+
+    exports net.javacrumbs.shedlockexample to spring.core;
+    opens net.javacrumbs.shedlockexample to spring.core, spring.beans, spring.context;
 }
