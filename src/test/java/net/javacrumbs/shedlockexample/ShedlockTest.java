@@ -15,20 +15,30 @@
  */
 package net.javacrumbs.shedlockexample;
 
+import net.javacrumbs.shedlock.core.LockProvider;
 import org.hsqldb.Server;
+import org.junit.Test;
+import org.junit.runner.RunWith;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.test.context.ContextConfiguration;
+import org.springframework.test.context.junit4.SpringRunner;
 
-import java.sql.SQLException;
+import static org.junit.Assert.assertNotNull;
 
-public class Db {
-    public static void main(String[] args) throws SQLException {
-        startDb();
+@RunWith(SpringRunner.class)
+@ContextConfiguration(classes = SpringConfig.class)
+public class ShedlockTest {
+    static {
+        Server server = Db.startDb();
+
+        Runtime.getRuntime().addShutdownHook(new Thread(server::stop));
     }
 
-    static Server startDb() {
-        Server server = new Server();
-        server.setDatabaseName(0, "test");
-        server.setDatabasePath(0, "./test");
-        server.start();
-        return server;
+    @Autowired
+    private LockProvider lockProvider;
+
+    @Test
+    public void testLockManager() {
+        assertNotNull(lockProvider);
     }
 }

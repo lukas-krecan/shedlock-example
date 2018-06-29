@@ -2,11 +2,10 @@ open module shedlock.example {
     requires spring.context;
     requires hsqldb;
     requires HikariCP;
-    requires shedlock.core;
-    requires slf4j.api;
+    requires org.slf4j;
     requires spring.jdbc;
-    requires shedlock.provider.jdbc.template;
-    requires shedlock.spring;
+    requires net.javacrumbs.shedlock.provider.jdbctemplate;
+    requires net.javacrumbs.shedlock.spring;
     requires java.sql;
 
     //opens net.javacrumbs.shedlockexample to spring.core;
